@@ -1,0 +1,99 @@
+---
+- name: Preparing Workstation
+  hosts: localhost
+  connection: local
+  tasks:
+
+    - name: getting package facts
+      package_facts:
+        manager: auto
+
+    - name: install libs
+      become: true
+      apt:
+        name: '{{ item }}'
+        state: present
+      loop:
+        
+        # basicos
+        - htop
+        - wget
+        - curl
+        - nano
+        - git
+        - jq
+        - zsh
+        
+        # docker
+        - ca-certificates
+        - gnupg
+        - lsb-release
+
+        # outros
+        - code # VSCode
+        - remmina # RDP client
+        
+
+    - name: install by .deb
+      become: true
+      apt:
+        deb: '{{ item }}'
+      loop:  
+        - debs/forticlient_6.4.deb
+        - debs/teams_1.4.00.26453_amd64.deb
+
+    - name: add docker repo
+      become: true
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt update
+      when: "'docker-ce' not in ansible_facts.packages"
+    - name: install docker
+      notify: config docker user
+      become: true
+      apt:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+
+    - name: Verify if Oh-My-zsh is installed
+      command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
+      register: ohmyzsh
+      ignore_errors: true
+    - name: Installing Oh-My-zsh
+      when: ohmyzsh.rc != 0
+      shell: sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    - name: Changing Default Shell to ZSH
+      become: yes
+      user: 
+        name: '{{ ansible_user_id }}'
+        shell: /bin/zsh 
+
+    - name: Verify asdf is installed
+      command: test -d /home/{{ ansible_user_id }}/.asdf
+      register: asdf
+      ignore_errors: true
+    - name: Installing asdf
+      when: asdf.rc != 0
+      shell: |
+        git clone https://github.com/asdf-vm/asdf.git /home/{{ ansible_user_id }}/.asdf --branch v0.9.0
+        echo ". $HOME/.asdf/asdf.sh" >> /home/{{ ansible_user_id }}//.zshrc
+    
+    - name: Verify sdkman is installed
+      command: test -d /home/{{ ansible_user_id }}/.sdkman
+      register: sdkman
+      ignore_errors: true
+    - name: Installing sdkman
+      when: sdkman.rc != 0
+      shell: |
+        curl -s "https://get.sdkman.io" | bash
+        echo ". $HOME/.sdkman/bin/sdkman-init.sh" >> /home/{{ ansible_user_id }}//.zshrc
+
+  handlers:
+    - name: config docker user
+      become: true
+      shell: usermod -aG docker {{ ansible_user_id }}

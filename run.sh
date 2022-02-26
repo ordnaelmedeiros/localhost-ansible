@@ -1,0 +1,1 @@
+ansible-playbook popos.yml --ask-become-pass

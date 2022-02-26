@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name=Eclipse
+GenericName=Eclipse
+Comment=Eclipse
+Path=/home/leandro/app/eclipse
+Exec=/home/leandro/app/eclipse/eclipse
+Icon=/home/leandro/app/eclipse/icon.xpm
+Categories=IDE;Development
+WMCLASS=Eclipse
+StartupWMClass=Eclipse
+StartupNotify=true
+Keywords=IDE;Java
+MimeType=application/java
