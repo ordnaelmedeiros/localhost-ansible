@@ -14,6 +14,6 @@ asdf global nodejs 16.14.0
 
 sdk install quarkus
 
-flatpak install flathub org.eclipse.Java -y
-flatpak install flathub io.dbeaver.DBeaverCommunity -y
-flatpak install flathub com.valvesoftware.Steam -y
+# flatpak install flathub org.eclipse.Java -y
+# flatpak install flathub io.dbeaver.DBeaverCommunity -y
+# flatpak install flathub com.valvesoftware.Steam -y

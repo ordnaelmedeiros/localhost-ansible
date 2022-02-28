@@ -3,8 +3,8 @@
 execute:
 ```
 sudo apt update && sudo apt upgrade -y
-sudo apt install git ansible
-ansible-playbook tools/ubuntu.yml --ask-become-pass
+sudo apt install git ansible -y
+ansible-playbook popos.yml --ask-become-pass
 ```
 restart 
 
@@ -25,7 +25,7 @@ asdf global nodejs 16.14.0
 sdk install quarkus
 ```
 
-install via Pop Shop
+Pop Shop install
 
 Eclipse
 DBeaver
